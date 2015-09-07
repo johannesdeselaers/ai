@@ -1,6 +1,6 @@
 #include "player.hpp"
 #include <cstdlib>
-#include <math.h> 
+#include <math.h>
 #include <limits>
 
 
@@ -31,7 +31,7 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 	double value = -1 * std::numeric_limits<double>::infinity();
 
 	//Iterative deepening
-	for (int d = 0; d < 20; d++)
+	for (int d = 0; d < 5; d++)
 	{
 		//Initialize alpha and beta values to minus and plus infinity respectively.
 		double alpha = -1 * std::numeric_limits<double>::infinity();
@@ -90,7 +90,7 @@ double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, doubl
 				//Alpha cut-off
 				if (beta <= alpha) break;
 			}
-			
+
 		}
 
 		return value;
@@ -138,7 +138,7 @@ void Player::materialValue(const GameState &pState, int materialPoints[])
 			else materialPoints[0] -= 1;
 		}
 	}
-	
+
 }
 
 /*namespace checkers*/ }
