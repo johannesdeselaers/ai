@@ -37,6 +37,9 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 		double alpha = -1 * std::numeric_limits<double>::infinity();
 		double beta = std::numeric_limits<double>::infinity();
 
+		//Seconds left
+		double seconds_left_before = pDue.getSeconds();
+
 		for (unsigned int m; m < lNextStates.size(); m++)
 		{
 			float child_value = Player::MiniMaxAB(lNextStates[m], d, alpha, beta, true);
@@ -44,6 +47,7 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 		}
 
 		//Return move if there is not enough time for the next iteration.
+		double seconds_left = pDue.getSeconds();
 
 		//Sort children based on their value (highest first).
 	}
