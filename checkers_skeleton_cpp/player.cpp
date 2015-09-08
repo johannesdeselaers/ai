@@ -27,34 +27,36 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 	else if (nextPlayer&CELL_WHITE) color = -1;
 
 	//Initialize move choice and move value.
-	unsigned int move = 0;
-	double value = -1 * std::numeric_limits<double>::infinity();
+	unsigned int move;
 
 	//Iterative deepening
-	for (int d = 0; d < 5; d++)
+	for (int d = 7; d < 15; d++)
 	{
+		//Initialize value and move.
+		double value = -1 * std::numeric_limits<double>::infinity();
+		move = 0;
+
 		//Initialize alpha and beta values to minus and plus infinity respectively.
 		double alpha = -1 * std::numeric_limits<double>::infinity();
 		double beta = std::numeric_limits<double>::infinity();
 
-		//Seconds left
-		double seconds_left_before = pDue.getSeconds();
+		//Time left
+		double time_left_before = 1.0;
 
-		for (unsigned int m; m < lNextStates.size(); m++)
+		for (unsigned int m=0; m < lNextStates.size(); m++)
 		{
 			float child_value = Player::MiniMaxAB(lNextStates[m], d, alpha, beta, true);
 			if (child_value > value) move = m;
 		}
 
 		//Return move if there is not enough time for the next iteration.
-		double seconds_left = pDue.getSeconds();
+		double time_left = 0.0;
+		if ((time_left_before - time_left) > time_left) return lNextStates[move];
 
 		//Sort children based on their value (highest first).
 	}
 
-	return lNextStates[move];
-
-	//return lNextStates[0];
+	//return lNextStates[rand() % lNextStates.size()];
 }
 
 double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, double beta, bool maxPlayer)
@@ -118,8 +120,13 @@ double Player::StaticGameValue(const GameState &pState)
 	//Moves left until draw.
 	int movesLeft = (int)pState.getMovesUntilDraw();
 
+	//Available moves.
+	std::vector<GameState> lNextStates;
+	pState.findPossibleMoves(lNextStates);
+	int availableMoves = lNextStates.size();
+
 	//Heuristic (linear polynomial).
-	return B0 + B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * movesLeft;
+	return B0 + B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * movesLeft + B4 * availableMoves;
 }
 
 void Player::materialValue(const GameState &pState, int materialPoints[])

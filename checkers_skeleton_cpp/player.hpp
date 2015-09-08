@@ -24,9 +24,10 @@ public:
 
 	//Scoring parameters
 	const double B0 = 0.0; //Constant
-	const double B1 = 1.0; //Regular pieces
+	const double B1 = 1.0; //Pawn pieces
 	const double B2 = 2.0; //King pieces
 	const double B3 = 0.02; //Moves until draw
+	const double B4 = 0.1; //Available moves
 
 	//Scoring function
 	double StaticGameValue(const GameState &pState);
