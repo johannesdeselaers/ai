@@ -2,16 +2,21 @@
 #include <cstdlib>
 #include <math.h>
 #include <limits>
+#include <chrono>
 
+using namespace std;
 
 namespace checkers
 {
 
 GameState Player::play(const GameState &pState,const Deadline &pDue)
 {
-    //std::cerr << "Processing " << pState.toMessage() << std::endl;
+    //cerr << "Processing " << pState.toMessage() << endl;
 
-    std::vector<GameState> lNextStates;
+    chrono::system_clock::time_point start = chrono::system_clock::now();
+    chrono::system_clock::time_point deadline = start + chrono::seconds(1);
+
+    vector<GameState> lNextStates;
     pState.findPossibleMoves(lNextStates);
 
     if (lNextStates.size() == 0) return GameState(pState, Move());
@@ -33,15 +38,17 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 	for (int d = 7; d < 15; d++)
 	{
 		//Initialize value and move.
-		double value = -1 * std::numeric_limits<double>::infinity();
+		double value = -1 * numeric_limits<double>::infinity();
 		move = 0;
 
 		//Initialize alpha and beta values to minus and plus infinity respectively.
-		double alpha = -1 * std::numeric_limits<double>::infinity();
-		double beta = std::numeric_limits<double>::infinity();
+		double alpha = -1 * numeric_limits<double>::infinity();
+		double beta = numeric_limits<double>::infinity();
 
 		//Time left
-		double time_left_before = 1.0;
+		chrono::system_clock::time_point now = chrono::system_clock::now();
+		chrono::duration<double> time_left_before = deadline - now;
+		double time_left_before_ = 1.0;
 
 		for (unsigned int m=0; m < lNextStates.size(); m++)
 		{
@@ -50,8 +57,20 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 		}
 
 		//Return move if there is not enough time for the next iteration.
-		double time_left = 0.0;
-		if ((time_left_before - time_left) > time_left) return lNextStates[move];
+		chrono::system_clock::time_point now = chrono::system_clock::now();
+		chrono::duration<double> time_left = deadline - now;
+		chrono::duration<double> time_passed = now - start;
+
+		chrono::milliseconds millisec_passed = std::chrono::duration_cast<chrono::milliseconds>(time_passed);
+		chrono::milliseconds millisec_left = std::chrono::duration_cast<chrono::milliseconds>(time_left);
+		chrono::milliseconds millisec_left_before = std::chrono::duration_cast<chrono::milliseconds>(time_left_before);
+
+		cout << millisec_left.count() << "ms left" << endl;
+		cout << millisec_passed.count() << "ms passed" << endl;
+		cout << millisec_passed.count() << "ms passed" << endl;
+
+		double time_left_ = 0.0;
+		if ((time_left_before_ - time_left_) > time_left_) return lNextStates[move];
 
 		//Sort children based on their value (highest first).
 	}
@@ -66,11 +85,11 @@ double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, doubl
 	{
 		//Initialize value to minus/plus infinity.
 		double value;
-		if (maxPlayer) value = -1 * std::numeric_limits<double>::infinity();
-		else value = std::numeric_limits<double>::infinity();
+		if (maxPlayer) value = -1 * numeric_limits<double>::infinity();
+		else value = numeric_limits<double>::infinity();
 
 		//Get GameState children (possible next moves).
-		std::vector<GameState> lNextStates;
+		vector<GameState> lNextStates;
 		pState.findPossibleMoves(lNextStates);
 
 		for (unsigned int i = 0; i < lNextStates.size(); i++)
@@ -81,8 +100,8 @@ double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, doubl
 			if (maxPlayer)
 			{
 				//Update value and alpha.
-				value = std::max(value, child_value);
-				alpha = std::max(value, alpha);
+				value = max(value, child_value);
+				alpha = max(value, alpha);
 
 				//Beta cut-off
 				if (beta <= alpha) break;
@@ -90,8 +109,8 @@ double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, doubl
 			else
 			{
 				//Update value and beta.
-				value = std::min(value, child_value);
-				beta = std::min(value, beta);
+				value = min(value, child_value);
+				beta = min(value, beta);
 
 				//Alpha cut-off
 				if (beta <= alpha) break;
@@ -121,7 +140,7 @@ double Player::StaticGameValue(const GameState &pState)
 	int movesLeft = (int)pState.getMovesUntilDraw();
 
 	//Available moves.
-	std::vector<GameState> lNextStates;
+	vector<GameState> lNextStates;
 	pState.findPossibleMoves(lNextStates);
 	int availableMoves = lNextStates.size();
 
