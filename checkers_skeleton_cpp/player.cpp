@@ -35,8 +35,9 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 	unsigned int move;
 
 	//Iterative deepening
-	for (int d = 7; d < 15; d++)
+	for (int d = 2; d < 15; d++)
 	{
+		cout << "Starting Depth: " << d << endl;
 		//Initialize value and move.
 		double value = -1 * numeric_limits<double>::infinity();
 		move = 0;
@@ -68,7 +69,8 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 		cout << millisec_left.count() << "ms left" << endl;
 		cout << millisec_passed.count() << "ms passed" << endl;
 
-		if ((time_left_before - time_left) > time_left) return lNextStates[move];
+		chrono::milliseconds timeEstimateForNextIteration = 2 * (time_left_before - time_left)
+		if (timeEstimateForNextIteration > time_left) return lNextStates[move];
 
 		//Sort children based on their value (highest first).
 	}
