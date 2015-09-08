@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 
         // Quit if this is end of game
         if (input_state.getMove().isEOG())
-            break;
+			break;
 
         // Deadline is one second from when we receive the message
         checkers::Deadline deadline = checkers::Deadline::now() + (fast ? 0.1 : 1.0);
@@ -88,7 +88,8 @@ int main(int argc, char **argv)
         std::cout << output_message << std::endl;
 
         // Quit if this is end of game
-        if (output_state.getMove().isEOG())
-            break;
+		if (output_state.getMove().isEOG())
+			break;
+            
     }
 }
