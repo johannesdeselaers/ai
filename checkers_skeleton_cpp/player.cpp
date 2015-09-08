@@ -75,8 +75,13 @@ double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, doubl
 
 		for (unsigned int i = 0; i < lNextStates.size(); i++)
 		{
+			//Increase depth by when whe there is only one possible move (explored beyond forzed moves).
+			double next_depth;
+			if (lNextStates.size() == 1) next_depth = depth;
+			else next_depth = (depth - 1);
+
 			//Get child value
-			double child_value = Player::MiniMaxAB(lNextStates[i], (depth - 1), alpha, beta, !maxPlayer);
+			double child_value = Player::MiniMaxAB(lNextStates[i], next_depth, alpha, beta, !maxPlayer);
 
 			if (maxPlayer)
 			{
