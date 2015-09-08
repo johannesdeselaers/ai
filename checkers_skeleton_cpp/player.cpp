@@ -46,9 +46,8 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 		double beta = numeric_limits<double>::infinity();
 
 		//Time left
-		chrono::system_clock::time_point now = chrono::system_clock::now();
-		chrono::duration<double> time_left_before = deadline - now;
-		double time_left_before_ = 1.0;
+		chrono::system_clock::time_point tmp = chrono::system_clock::now();
+		chrono::duration<double> time_left_before = deadline - tmp;
 
 		for (unsigned int m=0; m < lNextStates.size(); m++)
 		{
@@ -61,16 +60,15 @@ GameState Player::play(const GameState &pState,const Deadline &pDue)
 		chrono::duration<double> time_left = deadline - now;
 		chrono::duration<double> time_passed = now - start;
 
-		chrono::milliseconds millisec_passed = std::chrono::duration_cast<chrono::milliseconds>(time_passed);
-		chrono::milliseconds millisec_left = std::chrono::duration_cast<chrono::milliseconds>(time_left);
-		chrono::milliseconds millisec_left_before = std::chrono::duration_cast<chrono::milliseconds>(time_left_before);
+		chrono::milliseconds millisec_passed = chrono::duration_cast<chrono::milliseconds>(time_passed);
+		chrono::milliseconds millisec_left = chrono::duration_cast<chrono::milliseconds>(time_left);
+		chrono::milliseconds millisec_left_before = chrono::duration_cast<chrono::milliseconds>(time_left_before);
 
+		cout << millisec_left_before.count() << "ms left before" << endl;
 		cout << millisec_left.count() << "ms left" << endl;
 		cout << millisec_passed.count() << "ms passed" << endl;
-		cout << millisec_passed.count() << "ms passed" << endl;
 
-		double time_left_ = 0.0;
-		if ((time_left_before_ - time_left_) > time_left_) return lNextStates[move];
+		if ((time_left_before - time_left) > time_left) return lNextStates[move];
 
 		//Sort children based on their value (highest first).
 	}
