@@ -89,7 +89,7 @@ namespace checkers
 			{
 				//Increase depth by when whe there is only one possible move (explored beyond forzed moves).
 				double next_depth;
-				if (nextStates[StateKey].size() == 1) next_depth = (depth - 1);
+				if (nextStates[StateKey].size() == 1) next_depth = (depth);
 				else next_depth = (depth - 1);
 
 				//Get child value
@@ -142,27 +142,30 @@ namespace checkers
 		int availableMoves = nextStates[StateKey].size();
 
 		//Heuristic (linear polynomial).
-		gameValues[StateKey] = B0 + B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * movesLeft + B4 * availableMoves;
+		gameValues[StateKey] = B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * movesLeft + B4 * availableMoves;
 	}
 
 	void Player::materialValue(const GameState &pState, int materialPoints[])
 	{
 
 		//There are 31 cells in the board.
-		for (int i = 0; i < 31; i++)
+		for (int i = 0; i < 32; i++)
 		{
+
+			//Points awarded depending on the piece position on the board.
+			int points = positionPoints[i];
 
 			//If the cell is occupied by white, increment points.
 			if (pState.at(i)&CELL_RED)
 			{
-				if (pState.at(i)&CELL_KING) materialPoints[1] += 1;
-				else materialPoints[0] += 1;
+				if (pState.at(i)&CELL_KING) materialPoints[1] += points;
+				else materialPoints[0] += points;
 			}
 			//If the piece belongs to the oponent, substract points as appropiate.
 			else if (pState.at(i)&CELL_WHITE)
 			{
-				if (pState.at(i)&CELL_KING) materialPoints[1] -= 1;
-				else materialPoints[0] -= 1;
+				if (pState.at(i)&CELL_KING) materialPoints[1] -= points;
+				else materialPoints[0] -= points;
 			}
 		}
 

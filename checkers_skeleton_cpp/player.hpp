@@ -24,15 +24,41 @@ namespace checkers
 		int color;
 
 		//Scoring parameters
-		const double B0 = 0.0; //Constant
 		const double B1 = 1.0; //Pawn pieces
-		const double B2 = 2.5; //King pieces
-		const double B3 = 0.02; //Moves until draw
-		const double B4 = 0.2; //Available moves
+		const double B2 = 2.0; //King pieces
+		const double B3 = 0.00; //Moves until draw
+		const double B4 = 1.0; //Available moves
+
+		//Points awarded depending on the piece position on the board.
+		//http://ai-depot.com/articles/minimax-explained/3/
+		std::unordered_map<int, int> positionPoints;
 
 		//Some hash maps to speed things up a bit.
 		std::unordered_map<std::string, std::vector<GameState>> nextStates;
 		std::unordered_map<std::string, double> gameValues;
+
+		//Constructor
+		Player()
+		{
+			//Assign values to board positions.
+			for (int i = 0; i < 32; i++)
+			{
+				if (i < 5) positionPoints[i] = 4;
+				else if (i < 9) positionPoints[i] = 3;
+				else if (i < 9) positionPoints[i] = 3;
+				else if (i < 11) positionPoints[i] = 2;
+				else if (i < 13) positionPoints[i] = 4;
+				else if (i < 14) positionPoints[i] = 2;
+				else if (i < 15) positionPoints[i] = 1;
+				else if (i < 17) positionPoints[i] = 1;
+				else if (i < 18) positionPoints[i] = 3;
+				else if (i < 19) positionPoints[i] = 2;
+				else if (i < 21) positionPoints[i] = 4;
+				else if (i < 23) positionPoints[i] = 2;
+				else if (i < 27) positionPoints[i] = 3;
+				else positionPoints[i] = 4;
+			}
+		}
 
 		//Scoring function
 		void StaticGameValue(const GameState &pState, const std::string StateKey);
