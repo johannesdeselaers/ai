@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <limits>
+#include <chrono>
 
 
 namespace checkers
@@ -10,7 +11,6 @@ namespace checkers
 	GameState Player::play(const GameState &pState, const Deadline &pDue)
 	{
 		//std::cerr << "Processing " << pState.toMessage() << std::endl;
-		//std::vector<GameState> lNextStates;
 		std::string StateKey = pState.toMessage();
 		if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
 
@@ -30,8 +30,11 @@ namespace checkers
 		//Initialize move choice and move value.
 		unsigned int move;
 
+		//Must move in less than one second.
+		double time_left_before = 1.0;
+
 		//Iterative deepening
-		for (int d = 7; d < 15; d++)
+		for (int d = 1; d < 10; d++)
 		{
 			//Initialize value and move.
 			double value = -1 * std::numeric_limits<double>::infinity();
@@ -41,8 +44,8 @@ namespace checkers
 			double alpha = -1 * std::numeric_limits<double>::infinity();
 			double beta = std::numeric_limits<double>::infinity();
 
-			//Time left
-			double time_left_before = 1.0;
+			//Time now
+			std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
 			for (unsigned int m = 0; m < nextStates[StateKey].size(); m++)
 			{
@@ -51,12 +54,15 @@ namespace checkers
 			}
 
 			//Return move if there is not enough time for the next iteration.
-			double time_left = 0.0;
-			if (4 * (time_left_before - time_left) > time_left) return nextStates[StateKey][move];
+			std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+			double time_left = time_left_before - time_span.count();
+			if (6 * (time_left_before - time_left) > time_left) return nextStates[StateKey][move];
+			time_left_before -= time_span.count();
 
 			//Sort children based on their value (highest first).
 		}
-
+		return nextStates[StateKey][move];
 	}
 
 	double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, double beta, bool maxPlayer)
@@ -132,8 +138,6 @@ namespace checkers
 		int movesLeft = (int)pState.getMovesUntilDraw();
 
 		//Available moves.
-		//std::vector<GameState> lNextStates;
-		//pState.findPossibleMoves(lNextStates);
 		if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
 		int availableMoves = nextStates[StateKey].size();
 

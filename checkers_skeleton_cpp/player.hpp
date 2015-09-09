@@ -26,9 +26,9 @@ namespace checkers
 		//Scoring parameters
 		const double B0 = 0.0; //Constant
 		const double B1 = 1.0; //Pawn pieces
-		const double B2 = 2.0; //King pieces
+		const double B2 = 2.5; //King pieces
 		const double B3 = 0.02; //Moves until draw
-		const double B4 = 0.1; //Available moves
+		const double B4 = 0.2; //Available moves
 
 		//Some hash maps to speed things up a bit.
 		std::unordered_map<std::string, std::vector<GameState>> nextStates;
