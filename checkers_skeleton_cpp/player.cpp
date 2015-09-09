@@ -49,8 +49,16 @@ namespace checkers
 
 			for (unsigned int m = 0; m < nextStates[StateKey].size(); m++)
 			{
+				//Select move if its a win.
+				if ((color == 1 && pState.isRedWin()) || (color == -1 && pState.isWhiteWin()))
+					return nextStates[StateKey][m];
+
 				float child_value = Player::MiniMaxAB(nextStates[StateKey][m], d, alpha, beta, true);
-				if (child_value > value) move = m;
+				if (child_value > value)
+				{
+					value = child_value;
+					move = m;
+				}
 			}
 
 			//Return move if there is not enough time for the next iteration.
@@ -75,21 +83,33 @@ namespace checkers
 			if (!gameValues.count(StateKey)) Player::StaticGameValue(pState, StateKey);
 			return gameValues[StateKey];
 		}
+		else if (pState.isDraw()) return 0.0;
+		else if (pState.isRedWin())
+		{
+			if (color == 1) return 10000.0;
+			else return -10000.0;
+		}
+		else if (pState.isWhiteWin())
+		{
+			if (color == -1) return 10000.0;
+			else return -10000.0;
+		}
 		else
 		{
+			//Get GameState children (possible next moves).
+			if (!nextStates.count(StateKey))
+				pState.findPossibleMoves(nextStates[StateKey]);
+
 			//Initialize value to minus/plus infinity.
 			double value;
 			if (maxPlayer) value = -1 * std::numeric_limits<double>::infinity();
 			else value = std::numeric_limits<double>::infinity();
 
-			//Get GameState children (possible next moves).
-			if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
-
 			for (unsigned int i = 0; i < nextStates[StateKey].size(); i++)
 			{
-				//Increase depth by when whe there is only one possible move (explored beyond forzed moves).
+				//Increase depth by one when whe there is only one possible move (explored beyond forzed moves).
 				double next_depth;
-				if (nextStates[StateKey].size() == 1) next_depth = (depth);
+				if (nextStates[StateKey].size() == 0) next_depth = (depth);
 				else next_depth = (depth - 1);
 
 				//Get child value
@@ -122,27 +142,21 @@ namespace checkers
 
 	void Player::StaticGameValue(const GameState &pState, const std::string StateKey)
 	{
-		//Score should equal to 1 if the game state is a victory :)
-		if (color == 1 && pState.isRedWin()) gameValues[StateKey] = 10000.0;
-		else if (color == -1 && pState.isWhiteWin()) gameValues[StateKey] = 10000.0;
-
-		//Check hash table to see if this value has already been computed before.
-
 		//Points awarded for regular pieces (zero-zum).
 		//Points for regular pieces stored at index 0.
 		//Points for king pieces stored at index 1.
-		int materialPoints[2];
+		int materialPoints[2] = { 0, 0 };
 		Player::materialValue(pState, materialPoints);
 
 		//Moves left until draw.
-		int movesLeft = (int)pState.getMovesUntilDraw();
+		//int movesLeft = (int)pState.getMovesUntilDraw();
 
 		//Available moves.
 		if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
 		int availableMoves = nextStates[StateKey].size();
 
 		//Heuristic (linear polynomial).
-		gameValues[StateKey] = B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * movesLeft + B4 * availableMoves;
+		gameValues[StateKey] = B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * availableMoves;// +B4 * movesLeft;
 	}
 
 	void Player::materialValue(const GameState &pState, int materialPoints[])

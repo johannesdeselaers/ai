@@ -26,8 +26,8 @@ namespace checkers
 		//Scoring parameters
 		const double B1 = 1.0; //Pawn pieces
 		const double B2 = 2.0; //King pieces
-		const double B3 = 0.00; //Moves until draw
-		const double B4 = 1.0; //Available moves
+		const double B3 = 1.0; //Available moves
+		const double B4 = 0.0; //Moves until draw
 
 		//Points awarded depending on the piece position on the board.
 		//http://ai-depot.com/articles/minimax-explained/3/
