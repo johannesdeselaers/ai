@@ -34,7 +34,7 @@ namespace checkers
 		double time_left_before = 1.0;
 
 		//Iterative deepening
-		for (int d = 1; d < 10; d++)
+		for (int d = 1; d < 9; d++)
 		{
 			//Initialize value and move.
 			double value = -1 * std::numeric_limits<double>::infinity();
@@ -53,7 +53,7 @@ namespace checkers
 				if ((color == 1 && pState.isRedWin()) || (color == -1 && pState.isWhiteWin()))
 					return nextStates[StateKey][m];
 
-				float child_value = Player::MiniMaxAB(nextStates[StateKey][m], d, alpha, beta, true);
+				float child_value = Player::MiniMaxAB(nextStates[StateKey][m], d, alpha, beta, false);
 				if (child_value > value)
 				{
 					value = child_value;
@@ -149,14 +149,14 @@ namespace checkers
 		Player::materialValue(pState, materialPoints);
 
 		//Moves left until draw.
-		//int movesLeft = (int)pState.getMovesUntilDraw();
+		int movesLeft = (int)pState.getMovesUntilDraw();
 
 		//Available moves.
 		if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
 		int availableMoves = nextStates[StateKey].size();
 
 		//Heuristic (linear polynomial).
-		gameValues[StateKey] = B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * availableMoves;// +B4 * movesLeft;
+		gameValues[StateKey] = B1 * color * materialPoints[0] + B2 * color * materialPoints[1] + B3 * availableMoves + (B4 / movesLeft);
 	}
 
 	void Player::materialValue(const GameState &pState, int materialPoints[])
