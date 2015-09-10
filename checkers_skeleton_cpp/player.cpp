@@ -109,7 +109,7 @@ namespace checkers
 			{
 				//Increase depth by one when whe there is only one possible move (explored beyond forzed moves).
 				double next_depth;
-				if (nextStates[StateKey].size() == 0) next_depth = (depth);
+				if (nextStates[StateKey].size() == 1) next_depth = (depth);
 				else next_depth = (depth - 1);
 
 				//Get child value
