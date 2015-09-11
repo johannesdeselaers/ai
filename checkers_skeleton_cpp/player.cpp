@@ -4,14 +4,36 @@
 #include <limits>
 #include <chrono>
 
+using namespace std;
+using namespace chrono;
 
 namespace checkers
 {
+	Player::Player()
+	{
+		//Assign values to board positions.
+		for (int i = 0; i < 32; i++)
+		{
+			if (i < 5) positionPoints[i] = 4;
+			else if (i < 9) positionPoints[i] = 3;
+			else if (i < 11) positionPoints[i] = 2;
+			else if (i < 13) positionPoints[i] = 4;
+			else if (i < 14) positionPoints[i] = 2;
+			else if (i < 15) positionPoints[i] = 1;
+			else if (i < 17) positionPoints[i] = 3;
+			else if (i < 18) positionPoints[i] = 1;
+			else if (i < 19) positionPoints[i] = 2;
+			else if (i < 21) positionPoints[i] = 4;
+			else if (i < 23) positionPoints[i] = 2;
+			else if (i < 27) positionPoints[i] = 3;
+			else positionPoints[i] = 4;
+		}
+	}
 
 	GameState Player::play(const GameState &pState, const Deadline &pDue)
 	{
-		//std::cerr << "Processing " << pState.toMessage() << std::endl;
-		std::string StateKey = pState.toMessage();
+		//cerr << "Processing " << pState.toMessage() << endl;
+		string StateKey = pState.toMessage();
 		if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
 
 		//if (lNextStates.size() == 0) return GameState(pState, Move());
@@ -37,15 +59,15 @@ namespace checkers
 		for (int d = 1; d < 9; d++)
 		{
 			//Initialize value and move.
-			double value = -1 * std::numeric_limits<double>::infinity();
+			double value = -1 * numeric_limits<double>::infinity();
 			move = 0;
 
 			//Initialize alpha and beta values to minus and plus infinity respectively.
-			double alpha = -1 * std::numeric_limits<double>::infinity();
-			double beta = std::numeric_limits<double>::infinity();
+			double alpha = -1 * numeric_limits<double>::infinity();
+			double beta = numeric_limits<double>::infinity();
 
 			//Time now
-			std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+			high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
 			for (unsigned int m = 0; m < nextStates[StateKey].size(); m++)
 			{
@@ -62,10 +84,11 @@ namespace checkers
 			}
 
 			//Return move if there is not enough time for the next iteration.
-			std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-			std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+			high_resolution_clock::time_point t2 = high_resolution_clock::now();
+			duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
 			double time_left = time_left_before - time_span.count();
-			if (6 * (time_left_before - time_left) > time_left) return nextStates[StateKey][move];
+			if (6 * (time_left_before - time_left) > time_left)
+				return nextStates[StateKey][move];
 			time_left_before -= time_span.count();
 
 			//Sort children based on their value (highest first).
@@ -76,7 +99,7 @@ namespace checkers
 	double Player::MiniMaxAB(const GameState &pState, int depth, double alpha, double beta, bool maxPlayer)
 	{
 		//Node StateKey
-		std::string StateKey = pState.toMessage();
+		string StateKey = pState.toMessage();
 
 		if (!depth)
 		{
@@ -102,8 +125,8 @@ namespace checkers
 
 			//Initialize value to minus/plus infinity.
 			double value;
-			if (maxPlayer) value = -1 * std::numeric_limits<double>::infinity();
-			else value = std::numeric_limits<double>::infinity();
+			if (maxPlayer) value = -1 * numeric_limits<double>::infinity();
+			else value = numeric_limits<double>::infinity();
 
 			for (unsigned int i = 0; i < nextStates[StateKey].size(); i++)
 			{
@@ -118,8 +141,8 @@ namespace checkers
 				if (maxPlayer)
 				{
 					//Update value and alpha.
-					value = std::max(value, child_value);
-					alpha = std::max(value, alpha);
+					value = max(value, child_value);
+					alpha = max(value, alpha);
 
 					//Beta cut-off
 					if (beta <= alpha) break;
@@ -127,20 +150,19 @@ namespace checkers
 				else
 				{
 					//Update value and beta.
-					value = std::min(value, child_value);
-					beta = std::min(value, beta);
+					value = min(value, child_value);
+					beta = min(value, beta);
 
 					//Alpha cut-off
 					if (beta <= alpha) break;
 				}
-
 			}
 
 			return value;
 		}
 	}
 
-	void Player::StaticGameValue(const GameState &pState, const std::string StateKey)
+	void Player::StaticGameValue(const GameState &pState, const string StateKey)
 	{
 		//Points awarded for regular pieces (zero-zum).
 		//Points for regular pieces stored at index 0.

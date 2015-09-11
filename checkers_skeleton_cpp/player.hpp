@@ -38,27 +38,7 @@ namespace checkers
 		std::unordered_map<std::string, double> gameValues;
 
 		//Constructor
-		Player()
-		{
-			//Assign values to board positions.
-			for (int i = 0; i < 32; i++)
-			{
-				if (i < 5) positionPoints[i] = 4;
-				else if (i < 9) positionPoints[i] = 3;
-				else if (i < 9) positionPoints[i] = 3;
-				else if (i < 11) positionPoints[i] = 2;
-				else if (i < 13) positionPoints[i] = 4;
-				else if (i < 14) positionPoints[i] = 2;
-				else if (i < 15) positionPoints[i] = 1;
-				else if (i < 17) positionPoints[i] = 1;
-				else if (i < 18) positionPoints[i] = 3;
-				else if (i < 19) positionPoints[i] = 2;
-				else if (i < 21) positionPoints[i] = 4;
-				else if (i < 23) positionPoints[i] = 2;
-				else if (i < 27) positionPoints[i] = 3;
-				else positionPoints[i] = 4;
-			}
-		}
+		Player();
 
 		//Scoring function
 		void StaticGameValue(const GameState &pState, const std::string StateKey);
