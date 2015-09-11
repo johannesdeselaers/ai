@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <math.h>
 #include <limits>
-#include <chrono>
 
 using namespace std;
 using namespace chrono;
@@ -53,10 +52,12 @@ namespace checkers
 		unsigned int move;
 
 		//Must move in less than one second.
+		high_resolution_clock::time_point start = high_resolution_clock::now();
+		deadline = start + seconds(1);
 		double time_left_before = 1.0;
 
 		//Iterative deepening
-		for (int d = 1; d < 9; d++)
+		for (int d = 1; d < 20; d++)
 		{
 			//Initialize value and move.
 			double value = -1 * numeric_limits<double>::infinity();
@@ -86,13 +87,22 @@ namespace checkers
 			//Return move if there is not enough time for the next iteration.
 			high_resolution_clock::time_point t2 = high_resolution_clock::now();
 			duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-			double time_left = time_left_before - time_span.count();
-			if (6 * (time_left_before - time_left) > time_left)
-				return nextStates[StateKey][move];
+			// double time_left = time_left_before - time_span.count();
+			// if (6 * (time_left_before - time_left) > time_left)
+			// {
+			// 	duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
+			// 	cout << "TIME LIMIT REACHED" << endl;
+			// 	cout << "time left: " << time_to_deadline.count() << endl;
+			// 	cout << "time left: " << time_left << "at depth: " << d << endl;
+			// 	return nextStates[StateKey][move];
+			// }
 			time_left_before -= time_span.count();
 
 			//Sort children based on their value (highest first).
 		}
+		// duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
+		// cout << "Returning with: " << time_to_deadline.count() << endl;
+
 		return nextStates[StateKey][move];
 	}
 
@@ -156,9 +166,15 @@ namespace checkers
 					//Alpha cut-off
 					if (beta <= alpha) break;
 				}
+
+				duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
+				// cout << "time left: " << time_to_deadline.count() << endl;
+				if (time_to_deadline.count() < 0.15)
+					break;
 			}
 
 			return value;
+
 		}
 	}
 

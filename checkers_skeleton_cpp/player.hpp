@@ -7,6 +7,7 @@
 #include "gamestate.hpp"
 #include <vector>
 #include <unordered_map>
+#include <chrono>
 
 namespace checkers
 {
@@ -22,6 +23,9 @@ namespace checkers
 
 		//Player's color (1 for red, -1 for white).
 		int color;
+
+		//Deadline
+		std::chrono::high_resolution_clock::time_point deadline;
 
 		//Scoring parameters
 		const double B1 = 1.0; //Pawn pieces
