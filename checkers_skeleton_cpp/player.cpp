@@ -105,7 +105,7 @@ namespace checkers
 			//Sort children based on their value (highest first).
 		}
 		duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
-		cout << "Returning with: " << time_to_deadline.count() << endl;
+		// cout << "Returning with: " << time_to_deadline.count() << endl;
 
 		return nextStates[StateKey][move];
 	}
@@ -173,8 +173,7 @@ namespace checkers
 
 				duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
 				// cout << "time left: " << time_to_deadline.count() << endl;
-				if (time_to_deadline.count() < 0.5)
-					break;
+				if (time_to_deadline.count() < 0.5) break;
 			}
 
 			return value;
