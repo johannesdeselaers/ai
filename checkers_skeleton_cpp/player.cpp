@@ -31,6 +31,10 @@ namespace checkers
 
 	GameState Player::play(const GameState &pState, const Deadline &pDue)
 	{
+		// empty hasmaps to avoid going out of memory
+		nextStates.clear();
+		gameValues.clear();
+
 		//cerr << "Processing " << pState.toMessage() << endl;
 		string StateKey = pState.toMessage();
 		if (!nextStates.count(StateKey)) pState.findPossibleMoves(nextStates[StateKey]);
@@ -100,8 +104,8 @@ namespace checkers
 
 			//Sort children based on their value (highest first).
 		}
-		// duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
-		// cout << "Returning with: " << time_to_deadline.count() << endl;
+		duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
+		cout << "Returning with: " << time_to_deadline.count() << endl;
 
 		return nextStates[StateKey][move];
 	}
@@ -169,7 +173,7 @@ namespace checkers
 
 				duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
 				// cout << "time left: " << time_to_deadline.count() << endl;
-				if (time_to_deadline.count() < 0.15)
+				if (time_to_deadline.count() < 0.5)
 					break;
 			}
 
