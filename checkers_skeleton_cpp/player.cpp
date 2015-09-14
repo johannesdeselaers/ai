@@ -27,7 +27,7 @@ namespace checkers
 		if (nextPlayer&CELL_RED) color = 1;
 		else if (nextPlayer&CELL_WHITE) color = -1;
 
-		//Initialize move choice and move value.
+		//Initialize move choice.
 		unsigned int move;
 
 		//Must move in less than one second.
@@ -36,15 +36,17 @@ namespace checkers
 		//Iterative deepening
 		for (int d = 1; d < 9; d++)
 		{
-			//Initialize value and move.
+			//Initialize value to minus infinity.
 			double value = -1 * std::numeric_limits<double>::infinity();
+
+			//Initialize move to the first given.
 			move = 0;
 
 			//Initialize alpha and beta values to minus and plus infinity respectively.
 			double alpha = -1 * std::numeric_limits<double>::infinity();
 			double beta = std::numeric_limits<double>::infinity();
 
-			//Time now
+			//Get the current time at this point.
 			std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
 			for (unsigned int m = 0; m < nextStates[StateKey].size(); m++)
@@ -53,7 +55,10 @@ namespace checkers
 				if ((color == 1 && pState.isRedWin()) || (color == -1 && pState.isWhiteWin()))
 					return nextStates[StateKey][m];
 
+				//Otherwise compute the value of the child state.
 				float child_value = Player::MiniMaxAB(nextStates[StateKey][m], d, alpha, beta, false);
+
+				//Remember the best move so far.
 				if (child_value > value)
 				{
 					value = child_value;
@@ -61,15 +66,24 @@ namespace checkers
 				}
 			}
 
-			//Return move if there is not enough time for the next iteration.
+			//Get the time at this point.
 			std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+			//Compute the amount of time taken in the previous iteration.
 			std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+			
+			//Compute the amounf of time left at this point.
 			double time_left = time_left_before - time_span.count();
+			
+			//Return move if there is not enough time for the next iteration.
 			if (6 * (time_left_before - time_left) > time_left) return nextStates[StateKey][move];
+			
+			//Update the amount of time left before we perform another search (one level deeper).
 			time_left_before -= time_span.count();
 
-			//Sort children based on their value (highest first).
 		}
+
+		//In theory we should never reach this line but without it the compiler complains.
 		return nextStates[StateKey][move];
 	}
 
