@@ -31,6 +31,11 @@ namespace checkers
 
 	GameState Player::play(const GameState &pState, const Deadline &pDue)
 	{
+		//Must move in less than one second.
+		high_resolution_clock::time_point start = high_resolution_clock::now();
+		deadline = start + seconds(1);
+		double time_left_before = 1.0;
+
 		// empty hasmaps to avoid going out of memory
 		nextStates.clear();
 		gameValues.clear();
@@ -55,17 +60,12 @@ namespace checkers
 		//Initialize move choice and move value.
 		unsigned int move;
 
-		//Must move in less than one second.
-		high_resolution_clock::time_point start = high_resolution_clock::now();
-		deadline = start + seconds(1);
-		double time_left_before = 1.0;
-
 		//Iterative deepening
 		for (int d = 1; d < 20; d++)
 		{
 			//Initialize value and move.
 			double value = -1 * numeric_limits<double>::infinity();
-			move = 0;
+			unsigned int new_move = 0;
 
 			//Initialize alpha and beta values to minus and plus infinity respectively.
 			double alpha = -1 * numeric_limits<double>::infinity();
@@ -74,7 +74,8 @@ namespace checkers
 			//Time now
 			high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-			for (unsigned int m = 0; m < nextStates[StateKey].size(); m++)
+			unsigned int m = 0;
+			for (m = 0; m < nextStates[StateKey].size(); m++)
 			{
 				//Select move if its a win.
 				if ((color == 1 && pState.isRedWin()) || (color == -1 && pState.isWhiteWin()))
@@ -84,9 +85,11 @@ namespace checkers
 				if (child_value > value)
 				{
 					value = child_value;
-					move = m;
+					new_move = m;
 				}
 			}
+
+			if(m ==nextStates[StateKey].size()) move = new_move;
 
 			//Return move if there is not enough time for the next iteration.
 			high_resolution_clock::time_point t2 = high_resolution_clock::now();
@@ -104,7 +107,7 @@ namespace checkers
 
 			//Sort children based on their value (highest first).
 		}
-		duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
+		// duration<double> time_to_deadline = duration_cast<duration<double>>(deadline - high_resolution_clock::now());
 		// cout << "Returning with: " << time_to_deadline.count() << endl;
 
 		return nextStates[StateKey][move];
